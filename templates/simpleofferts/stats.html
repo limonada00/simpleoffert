@@ -1,0 +1,35 @@
+{% extends "simpleofferts/base.html" %}
+{% block content %}
+<span>Top Categories:</span>
+
+<table class="table">
+	<tbody>
+		<tr><td>
+			<div class="jumbotron">
+				<div class="container" width="400px">
+					{% for topcat in top_categories %}
+					{{topcat.title}} - {{topcat.number_of_oferts}} offers <br>
+					{% endfor %}
+				</div>
+			</div>
+		</td></tr>
+</tbody>
+</table>
+
+
+Top Authors:
+<table class="table">
+	<tbody>
+		<tr><td>
+			<div class="jumbotron">
+				<div class="container" width="400px">
+					{% for topauth in top_authors %}
+
+					{{topauth.author__username}} - {{topauth.number_of_oferts}} offers in {{ topauth.number_of_categorys }} categories<br>
+					{% endfor %}
+				</div>
+			</div>
+		</td></tr>
+</tbody>
+</table>
+{% endblock content %}

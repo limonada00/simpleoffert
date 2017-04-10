@@ -1,0 +1,16 @@
+{% extends "simpleofferts/base.html" %}
+{% load static %}
+{% block title %}
+	Log in page.
+{% endblock title %}
+{% block content %}
+<div class="form-horizontal">
+  <p> User : {{ request.user }}</p>
+  <form action="" method="POST">
+    {{ form.as_p }}
+    {% csrf_token %}
+<p>abrakadarbra</p>
+    <input type="submit" value="Login" />
+  </form>
+</div>
+{% endblock content %}

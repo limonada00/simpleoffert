@@ -1,0 +1,13 @@
+{% extends "simpleofferts/base.html" %}
+{% block content %}
+
+<form method="POST" action="" class="form-horizontal" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-group">
+
+  {{ form.as_p }}
+
+  <input type="submit" value="Add Offer" />
+    </div>
+</form>
+{% endblock content %}

@@ -1,0 +1,17 @@
+{% extends "simpleofferts/base.html" %}
+
+{% block content %}
+    <div class="jumbotron">
+		<div class="media">
+			<div class="media-left media-middle">
+				<img src="/media/{{ object.image_field }}" width="150" height="75"></img>
+			</div>
+			<div class="media-body">
+				{{ object.title }} - {{ object.price }} <br>
+				Author: {{ object.author }} <br>
+				Category: {{ object.category }} <br>
+				From:{{ object.created_at }}
+			</div>
+        </div>
+    </div>
+{% endblock content %}

@@ -1,0 +1,14 @@
+{% extends "simpleofferts/base.html" %}
+{% load static %}
+{% block title %}
+	Register page.
+{% endblock title %}
+{% block content %}
+<div class="post-content post-thumbnail col-md-9">
+    <form method="post" action=".">
+        {{ form.as_p }}
+        <input type="submit" value="register" />
+        {% csrf_token %}
+    </form>
+</div>
+{% endblock content %}

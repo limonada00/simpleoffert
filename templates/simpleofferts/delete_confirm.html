@@ -1,0 +1,10 @@
+{% extends "simpleofferts/base.html" %}
+{% block content %}
+
+<form action="" method="post" class="form-horizontal" >
+    {% csrf_token %}
+    <p>Are you sure you want to delete "{{ object }}"?</p>
+    <input type="submit" value="Потвърди" />
+</form>
+
+{% endblock content %}

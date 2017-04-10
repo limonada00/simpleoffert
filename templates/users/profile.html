@@ -1,0 +1,18 @@
+{% extends "blog/base.html" %}
+{% load static %}
+{% block title %}
+	Profile page.
+{% endblock title %}
+{% block content %}
+<div class="post-content post-thumbnail col-md-9">
+
+{% if request.user.is_authenticated %}
+    <p>Здравей, {{ request.user.username }}. Ти си логнат в системата.</p>
+{% endif %}
+<div class="user_panel">
+    <a href="/users/logout/">logout</a>
+</div>
+</div>
+{% endblock content %}
+
+
