@@ -7,8 +7,9 @@ from django.contrib.auth.models import User
 from django.db.models import Count
 from django.views.generic import ListView,DetailView,DeleteView
 from django.views.generic.edit import CreateView, UpdateView
-from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
+from django.views.generic.base import ContextMixin, TemplateResponseMixin, View,TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+
 
 class index_view(ListView):
     #queryset = SimpleOfert.objects.all()
@@ -90,14 +91,23 @@ class DetailOfferView(DetailView):
     queryset = SimpleOfert.objects.all()
 
 
-
 class DeleteOfferView(LoginRequiredMixin,DeleteView):
     model = SimpleOfert
     template_name = 'simpleofferts/delete_confirm.html'
     success_url = reverse_lazy('simpleofferts:index')
 
 
+class StatsView(TemplateView):
+    template_name = "simpleofferts/stats.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(StatsView, self).get_context_data(**kwargs)
+        context['top_categories'] = Categories.objects.all().annotate(number_of_oferts=Count('categorys__id')).order_by('-number_of_oferts')[:3]
+        context['top_authors'] = SimpleOfert.objects.values("author__username").annotate(number_of_oferts=Count('author__id')).annotate(number_of_categorys=Count('category__id' ,distinct=True)).order_by('-number_of_oferts')[:3]
+        return context
+"""
 def stats_view(request):
     top_categories = Categories.objects.all().annotate(number_of_oferts=Count('categorys__id')).order_by('-number_of_oferts')[:3]
     top_authors = SimpleOfert.objects.values("author__username").annotate(number_of_oferts=Count('author__id')).annotate(number_of_categorys=Count('category__id' ,distinct=True)).order_by('-number_of_oferts')[:3]
     return render(request, 'simpleofferts/stats.html', locals())
+"""

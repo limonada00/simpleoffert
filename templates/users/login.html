@@ -4,12 +4,10 @@
 	Log in page.
 {% endblock title %}
 {% block content %}
-<div class="form-horizontal">
-  <p> User : {{ request.user }}</p>
-  <form action="" method="POST">
+<div class="jumbotron">
+  <form action="" method="POST" class="form-horizontal">
     {{ form.as_p }}
     {% csrf_token %}
-<p>abrakadarbra</p>
     <input type="submit" value="Login" />
   </form>
 </div>
