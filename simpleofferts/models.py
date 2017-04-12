@@ -10,6 +10,7 @@ class Categories(models.Model):
     def __str__(self):
         return self.title
 
+
 class SimpleOfert(models.Model):
     title = models.CharField(max_length=255, unique=True)
     content = models.TextField()
@@ -18,6 +19,19 @@ class SimpleOfert(models.Model):
     author = models.ForeignKey(User, related_name='authors')
     created_at = models.DateTimeField(default=timezone.now)
     category = models.ForeignKey(Categories, related_name='categorys')
+    zero = '0'
+    one = '1'
+    two = '2'
+    status_choices = (
+        (zero, 'pending'),
+        (one, 'approved'),
+        (two, 'rejected'),
+    )
+    status = models.CharField(
+        max_length=1,
+        choices=status_choices,
+        default=zero,
+    )
 
     def __str__(self):
         return self.title

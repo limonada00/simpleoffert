@@ -7,8 +7,10 @@ from django.contrib.auth.models import User
 from django.db.models import Count
 from django.views.generic import ListView,DetailView,DeleteView
 from django.views.generic.edit import CreateView, UpdateView
-from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
+from django.views.generic.base import ContextMixin, TemplateResponseMixin, View,TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from .mixin import CheckUserPassesTestMixin,SuperUserPassesTestMixin
+
 
 class index_view(ListView):
     #queryset = SimpleOfert.objects.all()
@@ -25,7 +27,7 @@ class index_view(ListView):
 
     def get_queryset(self):
         sel_category = self.request.GET.get('category', None)
-        query = SimpleOfert.objects.select_related('category', 'author')
+        query = SimpleOfert.objects.select_related('category', 'author').filter(status='1')
         if sel_category:
             return query.filter(category=sel_category)
         return query
@@ -70,7 +72,7 @@ class CreateOfferView(LoginRequiredMixin, CreateView):
         return reverse_lazy('simpleofferts:index')
 
 
-class UpdateOfferView(LoginRequiredMixin, UpdateView):
+class UpdateOfferView(LoginRequiredMixin,CheckUserPassesTestMixin, UpdateView):
     model = SimpleOfert
     pk_url_kwarg = 'offer'
     fields = ("title", "content", "category", "price")
@@ -90,14 +92,61 @@ class DetailOfferView(DetailView):
     queryset = SimpleOfert.objects.all()
 
 
-
 class DeleteOfferView(LoginRequiredMixin,DeleteView):
     model = SimpleOfert
     template_name = 'simpleofferts/delete_confirm.html'
     success_url = reverse_lazy('simpleofferts:index')
 
 
+class StatsView(TemplateView):
+    template_name = "simpleofferts/stats.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(StatsView, self).get_context_data(**kwargs)
+        context['top_categories'] = Categories.objects.all().annotate(number_of_oferts=Count('categorys__id')).order_by('-number_of_oferts')[:3]
+        context['top_authors'] = SimpleOfert.objects.values("author__username").annotate(number_of_oferts=Count('author__id')).annotate(number_of_categorys=Count('category__id' ,distinct=True)).order_by('-number_of_oferts')[:3]
+        return context
+
+
+class PendingOffersView(LoginRequiredMixin,SuperUserPassesTestMixin,ListView):
+    template_name = "simpleofferts/pending_offerts.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(PendingOffersView, self).get_context_data(**kwargs)
+        context['categories'] = Categories.objects.all()
+        return context
+
+    def get_queryset(self):
+        sel_category = self.request.GET.get('category', None)
+        query = SimpleOfert.objects.select_related('category', 'author').filter(status='0')
+        if sel_category:
+            return query.filter(category=sel_category)
+        return query
+
+
+class ApprovedAndRejectedOffersView(LoginRequiredMixin,):
+    pass
+
+
+class ApprovedAndRejectedView(LoginRequiredMixin, UpdateView):
+    """
+    model = SimpleOfert
+    if 'status' == 1:
+        
+    else:
+"""
+    pk_url_kwarg = 'offer'
+    fields = ("title", "content", "category", "price")
+    template_name = 'simpleofferts/create_offer.html'
+
+
+    def get_success_url(self):
+        return reverse_lazy('simpleofferts:index')
+
+
+"""
 def stats_view(request):
     top_categories = Categories.objects.all().annotate(number_of_oferts=Count('categorys__id')).order_by('-number_of_oferts')[:3]
     top_authors = SimpleOfert.objects.values("author__username").annotate(number_of_oferts=Count('author__id')).annotate(number_of_categorys=Count('category__id' ,distinct=True)).order_by('-number_of_oferts')[:3]
     return render(request, 'simpleofferts/stats.html', locals())
+"""

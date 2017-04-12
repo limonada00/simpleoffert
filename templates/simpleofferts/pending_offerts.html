@@ -1,0 +1,45 @@
+{% extends "simpleofferts/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+	<form class="form-inline" method="get" action="">
+		<select class="form-control" name="category">
+			{% for category in categories %}
+			<option value="{{category.id}}">{{category.title}}</option>
+		  {% endfor %}
+
+		</select>
+		<button type="submit" class="btn btn-primary">Search</button>
+	</form>
+
+	{% for ofert in object_list %}
+	<div class="jumbotron">
+		<div class="media">
+			<div class="media-left media-middle">
+				<img src="/media/{{ ofert.image_field }}" width="150" height="75"></img>
+			</div>
+			<div class="media-body">
+				{{ ofert.title }} - {{ ofert.price }} <br>
+				Author: {{ ofert.author }} <br>
+				Category: {{ ofert.category }} <br>
+				From:{{ ofert.created_at }}
+			</div>
+			<div class="media-right">
+				 <form method="GET" enctype="multipart/form-data" action="{% url 'simpleofferts:detail-offer' ofert.id %}">
+					 {% csrf_token %}
+					 <button class="btn btn-warning" type="submit">Прегледай</button>
+				 </form>
+
+					 <form method="POST" enctype="multipart/form-data" action="{% url 'simpleofferts:approved-rejected' ofert.id 1 %}">
+						{% csrf_token %}
+						<button class="btn btn-warning" type="submit">Одобри</button>
+					 </form>
+					 <form method="POST" enctype="multipart/form-data" action="{% url 'simpleofferts:approved-rejected' ofert.id 2 %}">
+						{% csrf_token %}
+						<button class="btn btn-danger" type="submit">Отхвърли </button>
+					 </form>
+
+			</div>
+		</div>
+	</div>
+	{% endfor %}
+{% endblock content %}
