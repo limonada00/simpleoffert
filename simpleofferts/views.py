@@ -12,6 +12,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .mixin import CheckUserPassesTestMixin,SuperUserPassesTestMixin
 
 
+
 class index_view(ListView):
     #queryset = SimpleOfert.objects.all()
     template_name = 'simpleofferts/index.html'
@@ -106,6 +107,7 @@ class StatsView(TemplateView):
         context['top_categories'] = Categories.objects.all().annotate(number_of_oferts=Count('categorys__id')).order_by('-number_of_oferts')[:3]
         context['top_authors'] = SimpleOfert.objects.values("author__username").annotate(number_of_oferts=Count('author__id')).annotate(number_of_categorys=Count('category__id' ,distinct=True)).order_by('-number_of_oferts')[:3]
         return context
+<<<<<<< HEAD
 
 
 class PendingOffersView(LoginRequiredMixin,SuperUserPassesTestMixin,ListView):
@@ -144,6 +146,8 @@ class ApprovedAndRejectedView(LoginRequiredMixin, UpdateView):
         return reverse_lazy('simpleofferts:index')
 
 
+=======
+>>>>>>> origin/master
 """
 def stats_view(request):
     top_categories = Categories.objects.all().annotate(number_of_oferts=Count('categorys__id')).order_by('-number_of_oferts')[:3]
