@@ -107,7 +107,6 @@ class StatsView(TemplateView):
         context['top_categories'] = Categories.objects.all().annotate(number_of_oferts=Count('categorys__id')).order_by('-number_of_oferts')[:3]
         context['top_authors'] = SimpleOfert.objects.values("author__username").annotate(number_of_oferts=Count('author__id')).annotate(number_of_categorys=Count('category__id' ,distinct=True)).order_by('-number_of_oferts')[:3]
         return context
-<<<<<<< HEAD
 
 
 class PendingOffersView(LoginRequiredMixin,SuperUserPassesTestMixin,ListView):
@@ -126,7 +125,7 @@ class PendingOffersView(LoginRequiredMixin,SuperUserPassesTestMixin,ListView):
         return query
 
 
-class ApprovedAndRejectedOffersView(LoginRequiredMixin,):
+class ApprovedAndRejectedOffersView(LoginRequiredMixin, ListView):
     pass
 
 
@@ -137,17 +136,18 @@ class ApprovedAndRejectedView(LoginRequiredMixin, UpdateView):
         
     else:
 """
+    model = SimpleOfert
     pk_url_kwarg = 'offer'
-    fields = ("title", "content", "category", "price")
-    template_name = 'simpleofferts/create_offer.html'
+    fields = ("status", )
+    template_name = 'simpleofferts/pending_offerts.html'
+
+    def form_valid(self, form):
+        return super().form_valid(form)
 
 
     def get_success_url(self):
         return reverse_lazy('simpleofferts:index')
 
-
-=======
->>>>>>> origin/master
 """
 def stats_view(request):
     top_categories = Categories.objects.all().annotate(number_of_oferts=Count('categorys__id')).order_by('-number_of_oferts')[:3]

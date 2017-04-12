@@ -21,6 +21,9 @@
                 <a class="navbar-brand" href="{% url 'simpleofferts:create-offert' %}">Add Offer</a>
                 <a class="navbar-brand" href="{% url 'simpleofferts:stats' %}">Statistics</a>
                 {% if request.user.is_authenticated %}
+                    {% if request.user.is_superuser %}
+                         <a class="navbar-brand" href="{% url 'simpleofferts:pending' %}">Pending Offerts</a>
+                    {% endif %}
                     <a class="navbar-brand" href="{% url 'users:logout' %}">Logout</a>
                 {% else %}
                     <a class="navbar-brand" href="{% url 'users:login' %}">Login</a>
