@@ -29,11 +29,11 @@
 					 <button class="btn btn-warning" type="submit">Прегледай</button>
 				 </form>
 
-					 <form method="POST" action="{% url 'simpleofferts:approved-rejected' ofert.id 1 %}">
+					 <form method="POST" action="{% url 'simpleofferts:approved-rejected' ofert.id 1 %}" enctype="multipart/form-data">
 						{% csrf_token %}
 						<button class="btn btn-warning" type="submit">Одобри</button>
 					 </form>
-					 <form method="POST" action="{% url 'simpleofferts:approved-rejected' ofert.id 2 %}">
+					 <form method="POST" action="{% url 'simpleofferts:approved-rejected' ofert.id 2 %}" enctype="multipart/form-data">
 						{% csrf_token %}
 						<button class="btn btn-danger" type="submit">Отхвърли </button>
 					 </form>

@@ -10,7 +10,125 @@ from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.base import ContextMixin, TemplateResponseMixin, View,TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .mixin import CheckUserPassesTestMixin,SuperUserPassesTestMixin
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.renderers import JSONRenderer
+from rest_framework.parsers import JSONParser
+from .serializers import SnippetSerializer, SimpleOffertsSerializer
+from rest_framework import mixins
+from rest_framework import generics
 
+
+class SimpleOfferts_listMixin(generics.ListCreateAPIView):
+    queryset = SimpleOfert.objects.all()
+    serializer_class = SimpleOffertsSerializer
+
+
+class SimpleOffertsDetailMixin(generics.RetrieveUpdateDestroyAPIView):
+    queryset = SimpleOfert.objects.all()
+    serializer_class = SimpleOffertsSerializer
+
+
+class Categories_listMixin(generics.ListCreateAPIView):
+    queryset = Categories.objects.all()
+    serializer_class = SnippetSerializer
+
+
+class CategoriesDetailMixin(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Categories.objects.all()
+    serializer_class = SnippetSerializer
+
+
+@csrf_exempt
+def SimpleOfferts_list(request):
+    """
+    List all code snippets, or create a new snippet.
+    """
+    if request.method == 'GET':
+        snippets = SimpleOfert.objects.all()
+        serializer = SimpleOffertsSerializer(snippets, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+    elif request.method == 'POST':
+        data = JSONParser().parse(request)
+        serializer = SimpleOffertsSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=201)
+        return JsonResponse(serializer.errors, status=400)
+
+
+@csrf_exempt
+def SimpleOfferts_detail(request, pk):
+    """
+    Retrieve, update or delete a code snippet.
+    """
+    try:
+        snippet = SimpleOfert.objects.get(pk=pk)
+    except SimpleOfert.DoesNotExist:
+        return HttpResponse(status=404)
+
+    if request.method == 'GET':
+        serializer = SimpleOffertsSerializer(snippet)
+        return JsonResponse(serializer.data)
+
+    elif request.method == 'PUT':
+        data = JSONParser().parse(request)
+        serializer = SnippetSerializer(snippet, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data)
+        return JsonResponse(serializer.errors, status=400)
+
+    elif request.method == 'DELETE':
+        snippet.delete()
+        return HttpResponse(status=204)
+
+
+@csrf_exempt
+def snippet_list(request):
+    """
+    List all code snippets, or create a new snippet.
+    """
+    if request.method == 'GET':
+        snippets = Categories.objects.all()
+        serializer = SnippetSerializer(snippets, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+    elif request.method == 'POST':
+        data = JSONParser().parse(request)
+        serializer = SnippetSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=201)
+        return JsonResponse(serializer.errors, status=400)
+
+
+@csrf_exempt
+def snippet_detail(request, pk):
+    """
+    Retrieve, update or delete a code snippet.
+    """
+    try:
+        snippet = Categories.objects.get(pk=pk)
+    except Categories.DoesNotExist:
+        return HttpResponse(status=404)
+
+    if request.method == 'GET':
+        serializer = SnippetSerializer(snippet)
+        return JsonResponse(serializer.data)
+
+    elif request.method == 'PUT':
+        data = JSONParser().parse(request)
+        serializer = SnippetSerializer(snippet, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data)
+        return JsonResponse(serializer.errors, status=400)
+
+    elif request.method == 'DELETE':
+        snippet.delete()
+        return HttpResponse(status=204)
 
 
 class index_view(ListView):
@@ -59,6 +177,7 @@ def create_offert(request):
     form = SimpleOfertCreateModelForm()
     return render(request, 'simpleofferts/create_offer.html', locals())
 """
+
 
 class CreateOfferView(LoginRequiredMixin, CreateView):
     model = SimpleOfert
@@ -130,12 +249,30 @@ class ApprovedAndRejectedOffersView(LoginRequiredMixin, ListView):
 
 
 class ApprovedAndRejectedView(LoginRequiredMixin, UpdateView):
+
+    model = SimpleOfert
+    pk_url_kwarg = 'offer'
+    fields = ['status']
+    template_name = 'simpleofferts/pending_offerts.html'
+    success_url = 'simpleofferts:index'
+
+    def form_valid(self, form):
+        import ipdb;
+        ipdb.set_trace()
+        form.instance.author = self.request.user
+        form.instance.status = self.request.status
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('simpleofferts:index')
+
+
     """
     model = SimpleOfert
     if 'status' == 1:
         
     else:
-"""
+
     model = SimpleOfert
     pk_url_kwarg = 'offer'
     fields = ("status", )
@@ -147,7 +284,7 @@ class ApprovedAndRejectedView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse_lazy('simpleofferts:index')
-
+"""
 """
 def stats_view(request):
     top_categories = Categories.objects.all().annotate(number_of_oferts=Count('categorys__id')).order_by('-number_of_oferts')[:3]
